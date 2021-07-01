@@ -4,14 +4,21 @@ const mysql = require('mysql')
 const cors = require('cors')
 
 const port = process.env.PORT || 4002;
+const hostname = require('./config/keys').host;
+const username = require('./config/keys').user;
+const dbpassword = require('./config/keys').pass;
+const dbname = require('./config/keys').database
+
 
 const db = mysql.createPool({
     connectionLimit:10,
-    host    :require('./config/keys').host,
-    user    :require('./config/keys').user,
-    password:require('./config/keys').pass,
-    database:require('./config/keys').database
+    host    :hostname,
+    user    :username,
+    password:dbpassword,
+    database:dbname
 });
+
+console.log('database', db);
 
 app.use(cors());
 app.use(express.json())
