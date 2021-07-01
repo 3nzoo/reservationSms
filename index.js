@@ -56,6 +56,21 @@ app.post('/api/reservation',(req,res)=>{
 
 });
 
+// create new data in table using get
+app.get('/newmessage',(req,res)=>{
+    const message = {name:'heroku', body:'from heroku: for five at 3pm'};
+
+    //INSERT INTO {Table Name} SET ?
+    const sql = 'INSERT INTO message SET ?'
+    const query = db.query(sql, message, (err, result)=>{
+        if(err){
+            throw err;
+        } 
+        console.log('res', result);
+        res.send('new message created....')
+    })
+})
+
 
 app.listen(port,()=>{
     console.log(`server at port ${port}`);
