@@ -1,8 +1,10 @@
 module.exports = {
-    sID: process.env.TWILIO_ACCOUNT_SID,
-    aToken: process.env.TWILIO_AUTH_TOKEN,
+    sID: process.env.SID,
+    aToken: process.env.ATOKEN,
     host:process.env.HOST,
     user: process.env.USER,
     pass: process.env.PASSWORD,
-    database:process.env.DATABASE
+    database:process.env.DATABASE,
+    from:process.env.FROM,
+    reciever:process.env.RECIEVER
 };
