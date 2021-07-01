@@ -55,13 +55,17 @@ app.post('/api/reservation',(req,res)=>{
 
 });
 
+app.get('/api', async (req,res)=>{
+    res.send('connected')
+})
+
 // create new data in table using get
-app.get('/newmessage',(req,res)=>{
+app.get('/newmessage', async (req,res)=>{
     const message = {name:'heroku', body:'from heroku: for five at 3pm'};
 
     //INSERT INTO {Table Name} SET ?
     const sql = 'INSERT INTO message SET ?'
-    const query = db.query(sql, message, (err, result)=>{
+    const query = await db.query(sql, message, (err, result)=>{
         if(err){
             throw err;
         } 
