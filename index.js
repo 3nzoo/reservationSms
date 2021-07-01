@@ -5,8 +5,7 @@ const cors = require('cors')
 
 const port = process.env.PORT || 4002;
 
-const db = mysql.createPool({
-    connectionLimit : 10,
+const db = mysql.createConnection({
     host    :require('./config/keys').host,
     user    :require('./config/keys').user,
     password:require('./config/keys').pass,
@@ -17,7 +16,7 @@ app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}));
 
-// db.connect((err)=>{if(err){throw err} console.log('db is connected');});
+db.connect((err)=>{if(err){throw err} console.log('db is connected');});
 
 app.post('/api/reservation',(req,res)=>{
 
