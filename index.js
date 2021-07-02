@@ -6,81 +6,80 @@ const cors = require('cors')
 const port = process.env.PORT || 4002;
 
 const db = mysql.createPool({
-    connectionLimit:10,
-    host    :require('./config/keys').host,
-    user    :require('./config/keys').user,
-    password:require('./config/keys').pass,
-    database:require('./config/keys').database
+    connectionLimit: 10,
+    host: require('./config/keys').host,
+    user: require('./config/keys').user,
+    password: require('./config/keys').pass,
+    database: require('./config/keys').database
 });
-
 
 app.use(cors());
 app.use(express.json())
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
-// db.connect((err)=>{
-//     if(err){throw err} 
-//     console.log('db is connected');
-// });
+app.post('/api/contact', (req, res) => {
+    const name = req.body.name;
+    const phone = req.body.phone;
+    const email = req.body.email;
+    const message = req.body.message;
+    const dateAdded = new Date();
 
-app.post('/api/reservation',(req,res)=>{
+    const sqlInsert = "INSERT INTO contact (name, phone, email,pax, time, request, schedule, addedat) VALUES (?,?,?,?,?)";
+    db.query(sqlInsert, [name, phone, email, message, dateAdded], (err, result) => {
+        
+        const accountSid = require('./config/keys').sID;
+        const authToken = require('./config/keys').aToken;
+        const fromNumber = require('./config/keys').from;
+        const reciever = require('./config/keys').reciever
+        const client = require('twilio')(accountSid, authToken);
 
-    const customer = req.body.name;
-    const schedule = req.body.body;
-    // const pax = req.body.pax;
-    // const contact = req.body.contact
-    // const resDate = Date.now
-    // const cusRequest = req.body.customRequest
-
-    //***mysql query */
-    // const sqlInsert = "INSERT INTO message (customer, schedule, pax, contact, resDate) VALUES (?,?,?,?)";
-    // db.query(sqlInsert, [customer, schedule, pax,resDate], (err,result)=>{
-    //     console.log(result);
-    // })
-
-
-    const sqlInsert = "INSERT INTO message (name, body) VALUES (?,?)";
-    db.query(sqlInsert, [customer, schedule], (err,result)=>{
+        client.messages
+            .create({
+                body: `customer: ${name} \nContact #: ${phone} \nEmail: ${email} \nMessage: ${message} \nDate Inquired: ${dateAdded}`,
+                from: `+${fromNumber}`,
+                to: `+${reciever}`
+            })
+            .then(message => console.log('Sms Sent', message));
     });
-
-
-// const accountSid = require('./config/keys').sID;
-// const authToken = require('./config/keys').aToken;
-// const fromNumber = require('./config/keys').from;
-// const reciever =require('./config/keys').reciever
-// const client = require('twilio')(accountSid, authToken);
-
-// client.messages
-//   .create({
-//      body: 'customer: ${customer} \nSchedule: ${schedule} \nPax: ${pax} \nContact: ${contact} \nRequest: ${request}',
-//      from: `+${fromNumber}`,
-//      to: `+${reciever}` 
-//    })
-//   .then(message => console.log(message.sid));
 
 });
 
-app.get('/api', async (req,res)=>{
+
+app.post('/api/reservation', (req, res) => {
+
+    const customer = req.body.name;
+    const schedule = req.body.sched;
+    const pax = req.body.pax;
+    const contact = req.body.phone;
+    const time = req.body.time;
+    const customerRequest = req.body.customerRequest;
+    const dateAdded = new Date();
+
+    const sqlInsert = "INSERT INTO reservation (name, phone, Date,pax, time, request, schedule, addedat) VALUES (?,?,?,?,?,?,?)";
+    db.query(sqlInsert, [customer, contact, schedule, pax, time, customerRequest, dateAdded], (err, result) => {
+
+        const accountSid = require('./config/keys').sID;
+        const authToken = require('./config/keys').aToken;
+        const fromNumber = require('./config/keys').from;
+        const reciever = require('./config/keys').reciever
+        const client = require('twilio')(accountSid, authToken);
+
+        client.messages
+            .create({
+                body: `Customer Name: ${customer} \nContact #: ${contact} \nDate: ${schedule} \nPax: ${pax} \nTime: ${time} \nRequest: ${customerRequest} \nDate Inquired: ${dateAdded}`,
+                from: `+${fromNumber}`,
+                to: `+${reciever}`
+            })
+            .then(message => console.log('Reservation Sms Sent', message));
+    });
+
+});
+
+app.get('/api', async (req, res) => {
     res.send('connected')
 })
 
-// create new data in table using get
-app.get('/newmessage', async (req,res)=>{
-    const message = {name:'heroku', body:'from heroku: for five at 3pm'};
-
-    //INSERT INTO {Table Name} SET ?
-    const sql = 'INSERT INTO message SET ?'
-    const query = await db.query(sql, message, (err, result)=>{
-        if(err){
-            throw err;
-        } 
-        console.log('res', result);
-        res.send('new message created....')
-    })
-})
-
-
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`server at port ${port}`);
 });
 
