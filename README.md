@@ -5,7 +5,7 @@ Stacks & Features
 1. Db - Mysql
 2. Sms - Twilio 
 3. server-side Language - Nodejs
-4. middleware - Express
+4. backend framework - Express
 5. email - Nodemailer
 
 
